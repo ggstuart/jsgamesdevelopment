@@ -1,0 +1,194 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Simple keyboard interaction</title>
+    <link rel="stylesheet" href="styles.css" media="screen" title="no title" charset="utf-8">
+    <script type="text/javascript" src="drawing.js"></script>
+  </head>
+  <body>
+    <h1>Simple keyboard interaction</h1>
+    <canvas id="asteroids" width="400" height="400" tabindex="1"></canvas>
+    <script type="application/javascript">
+      'use strict';
+      var fps;
+      var canvas = document.getElementById("asteroids");
+      var context = canvas.getContext("2d");
+
+      var guide = true;
+      var pacman = new PacMan(20, 100);
+      var ghosts = [];
+      for(var i = 0; i < 2; i++) {
+        ghosts.push(new Ghost(20, 40 + Math.random() * 40, "#00FFFF"));
+        ghosts.push(new Ghost(20, 40 + Math.random() * 40, "#FF00FF"));
+        ghosts.push(new Ghost(20, 40 + Math.random() * 40, "#0000FF"));
+      }
+
+      function Ghost(radius, speed, colour) {
+        this.x = canvas.width * Math.random();
+        this.y = canvas.width * Math.random();
+        this.speed = speed;
+        this.radius = radius;
+        this.colour = colour;
+      }
+
+      Ghost.prototype.draw = function(c, guide) {
+        context.save();
+        context.strokeStyle = "#FFFFFF";
+        context.fillStyle = this.colour;
+        context.lineWidth = 1.5;
+        context.translate(this.x, this.y);
+        draw_ghost(c, this.radius, 4, guide);
+        context.restore();
+      }
+
+      Ghost.prototype.update = function(target, elapsed) {
+        var angle = Math.atan2(target.y - this.y, target.x - this.x);
+        var x_speed = Math.cos(angle) * this.speed;
+        var y_speed = Math.sin(angle) * this.speed;
+        this.x += x_speed * elapsed;
+        this.y += y_speed * elapsed;
+      }
+
+      function PacMan(radius, speed) {
+        this.x = canvas.width / 2;
+        this.y = canvas.height / 2;
+        this.angle = 0;
+        this.speed = speed;
+        this.x_speed = speed;
+        this.y_speed = 0;
+        this.radius = radius;
+        this.mouth_angle = 0;
+      }
+
+      PacMan.prototype.update = function(elapsed) {
+        if(this.x - this.radius + elapsed * this.x_speed > canvas.width) {
+          this.x = -this.radius;
+        }
+        if(this.x + this.radius + elapsed * this.x_speed < 0) {
+          this.x = canvas.width + this.radius;
+        }
+        if(this.y - this.radius + elapsed * this.y_speed > canvas.height) {
+          this.y = -this.radius;
+        }
+        if(this.y + this.radius + elapsed * this.y_speed < 0) {
+          this.y = canvas.height + this.radius;
+        }
+        this.x += elapsed * this.x_speed;
+        this.y += elapsed * this.y_speed;
+        this.mouth_angle = (this.mouth_angle + (0.4 * Math.PI * elapsed)) % (0.2 * Math.PI);
+      }
+
+      PacMan.prototype.draw = function(c, guide) {
+        c.save();
+        c.translate(this.x, this.y);
+        c.rotate(this.angle);
+        draw_pacman(c, this.radius, this.mouth_angle, 0.2 * Math.PI, guide);
+        c.restore();
+      }
+
+      PacMan.prototype.turn = function(direction) {
+        if(this.y_speed) {
+          this.x_speed = -direction * this.y_speed;
+          this.y_speed = 0;
+          this.angle = this.x_speed > 0 ? 0 : Math.PI;
+        } else {
+          this.y_speed = direction * this.x_speed;
+          this.x_speed = 0;
+          this.angle = this.y_speed > 0 ? 0.5 * Math.PI : 1.5 * Math.PI;
+        }
+      }
+
+      PacMan.prototype.turn_left = function() {
+        this.turn(-1);
+      }
+
+      PacMan.prototype.turn_right = function() {
+        this.turn(1);
+      }
+
+      PacMan.prototype.move_up = function() {
+        this.x_speed = 0;
+        this.y_speed = -this.speed;
+        this.angle = Math.PI * 1.5;
+      }
+      PacMan.prototype.move_down = function() {
+        this.x_speed = 0;
+        this.y_speed = this.speed;
+        this.angle = Math.PI * 0.5;
+      }
+      PacMan.prototype.move_left = function() {
+        this.x_speed = -this.speed;
+        this.y_speed = 0;
+        this.angle = Math.PI;
+      }
+      PacMan.prototype.move_right = function() {
+        this.x_speed = this.speed;
+        this.y_speed = 0;
+        this.angle = 0;
+      }
+
+      function draw() {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        draw_grid(context);
+        context.fillStyle = "#FFFFFF";
+        context.fillText(fps.toFixed(1) + " fps", canvas.width - 50, canvas.height - 10);// to keep track of performance
+        pacman.draw(context, guide);
+        ghosts.forEach(function(ghost) {
+          ghost.draw(context, guide);
+        });
+      }
+
+      function update(elapsed) {
+        pacman.update(elapsed);
+        ghosts.forEach(function(ghost) {
+          ghost.update(pacman, elapsed);
+        });
+      }
+
+      function keydown_handler(e) {
+        var key = e.keyCode;
+        var nothing_handled = false;
+        // var handlers = {
+        //   37: pacman.move_left,
+        //   38: pacman.move_up,
+        //   39: pacman.move_right,
+        //   40: pacman.move_down
+        // }
+        // var method = handlers[key]
+        // method.call(pacman);
+        switch(key) {
+          case 37: // left arrow
+            pacman.move_left();
+            break;
+          case 38: // up arrow
+            pacman.move_up();
+            break;
+          case 39: // right arrow
+            pacman.move_right();
+            break;
+          case 40:
+            pacman.move_down();
+            break;
+          default:
+            nothing_handled = true;
+        }
+        if(!nothing_handled) e.preventDefault();
+      }
+      canvas.addEventListener("keydown", keydown_handler, true);
+      canvas.focus();
+
+      //our callback function to render the next frame
+      var previous; // remember the previous timestamp
+      function frame(timestamp) {
+        if (!previous) previous = timestamp;  // it runs once per frame
+        var elapsed = timestamp - previous;   // it calculates the elapsed time
+        update(elapsed/1000);                 // and passes it into the update() function
+        fps = 1000 / elapsed;                 // it calculates frames per second
+        draw();                               // it then calls the draw() function
+        previous = timestamp;                 // and remembers the time
+        window.requestAnimationFrame(frame);  // before asking the browser to call it again
+      }
+      window.requestAnimationFrame(frame); // this triggers the game loop to begin
+    </script>
+  </body>
+</html>

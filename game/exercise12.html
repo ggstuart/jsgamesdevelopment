@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Collision detection</title>
+    <link rel="stylesheet" href="styles.css" media="screen" title="no title" charset="utf-8">
+    <script src="drawing.js"></script>
+    <script src="asteroids.js"></script>
+    <script src="game.js"></script>
+  </head>
+  <body>
+    <h1>Collision detection</h1>
+    <canvas id="asteroids" width="400" height="400" tabindex="1"></canvas>
+    <script>
+      'use strict';
+
+      var game = new AsteroidsGame(document.getElementById("asteroids"));
+
+      function frame(timestamp) {
+        game.frame(timestamp);
+        window.requestAnimationFrame(frame);
+      }
+
+      game.canvas.addEventListener("keydown", function(e) {
+        game.key_handler(e, true);
+      });
+      game.canvas.addEventListener("keyup", function(e) {
+        game.key_handler(e, false);
+      });
+
+      window.requestAnimationFrame(frame);
+    </script>
+  </body>
+</html>

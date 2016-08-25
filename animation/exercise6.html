@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Animation</title>
+    <link rel="stylesheet" href="styles.css" media="screen" title="no title" charset="utf-8">
+    <script type="text/javascript" src="drawing.js"></script>
+  </head>
+  <body>
+    <h1>Animation</h1>
+    <canvas id="asteroids" width="400" height="400"></canvas>
+    <script type="application/javascript">
+      var canvas = document.getElementById("asteroids");
+      var context = canvas.getContext("2d");
+
+      var mouth = 0;
+      var dmouth = 0.01 * Math.PI;
+      var x = 200;
+      var y = 200;
+      var speed = 3;
+      var radius = 50;
+
+      function draw() {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.strokeStyle = "#00FF00";
+        context.fillStyle = "#00FF00";
+        draw_grid(context);
+        context.save();
+        context.strokeStyle = "#000000";
+        context.fillStyle = "#FFFF00";
+        context.lineWidth = 0.5;
+        context.translate(x, y);
+        draw_pacman(context, radius, mouth, null, true);
+        context.restore();
+      }
+
+      function update() {
+        if(mouth + dmouth >= (0.2 * Math.PI) || mouth + dmouth <= 0) {
+          dmouth *= -1;
+        }
+        mouth += dmouth;
+        if(x - radius + speed > canvas.width) {
+          x = -radius;
+        }
+        x += speed;
+      }
+
+      //our callback function to render the next frame
+      var frame = function() {
+        update();
+        draw();
+      }
+
+      // a really simple (and naive) approach to animation
+      // use setInterval to draw a new frame 60 times per second
+      setInterval(frame, 1000.0/60.0); // 60 fps
+    </script>
+  </body>
+</html>

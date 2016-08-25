@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Drawing asteroids</title>
+    <link rel="stylesheet" href="styles.css" media="screen" title="no title" charset="utf-8">
+    <script type="text/javascript" src="drawing.js"></script>
+  </head>
+  <body>
+    <h1>Drawing asteroids</h1>
+    <canvas id="asteroids" width="400" height="400"></canvas>
+    <script type="application/javascript">
+      var canvas = document.getElementById("asteroids");
+      var context = canvas.getContext("2d");
+
+      context.strokeStyle = "#00FF00";
+      context.fillStyle = "#009900";
+      draw_grid(context);
+
+      context.strokeStyle = "#FFFFFF";
+      context.fillStyle = "#000000";
+      context.lineWidth = 2;
+
+      function draw_asteroid(ctx, radius, shape, noise, guide) {
+        ctx.save();
+        ctx.beginPath();
+        for(var i = 0; i < shape.length; i++) {
+          ctx.rotate(2 * Math.PI / shape.length);
+          ctx.lineTo(radius + radius * noise * shape[i], 0);
+        }
+        ctx.closePath();
+        ctx.stroke();
+        ctx.fill();
+        if(guide) {
+          ctx.lineWidth = 0.5;
+          ctx.beginPath();
+          ctx.arc(0, 0, radius, 0, 2 * Math.PI);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.lineWidth = 0.2;
+          ctx.arc(0, 0, radius + radius * noise, 0, 2 * Math.PI);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(0, 0, radius - radius * noise, 0, 2 * Math.PI);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      var x, y, segments = Math.floor(5 + Math.random() * 45), noise = 0;
+      var shape = [];
+      var av = 0;
+      for(var i = 0; i < segments; i++) {
+        shape.push(2 * (Math.random() - 0.5));
+      }
+
+      // for(y = 40; y < canvas.height; y += 80) {
+      //   for(x = 40; x < canvas.width; x += 80) {
+      //     context.save();
+      //     context.translate(x, y);
+      //     draw_asteroid(context, 25, shape, noise, true);
+      //     context.restore();
+      //     noise += 0.025;
+      //   }
+      // }
+
+      // noise = 0.2;
+      noise = Math.random().toFixed(2);
+      context.translate(200, 200);
+      draw_asteroid(context, 120, shape, noise, true);
+      context.fillStyle = "#FFFFFF";
+      context.fillText(noise, -9, 2);
+
+    </script>
+  </body>
+</html>

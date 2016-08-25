@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Drawing to a design</title>
+    <link rel="stylesheet" href="styles.css" media="screen" title="no title" charset="utf-8">
+    <script type="text/javascript" src="drawing.js"></script>
+  </head>
+  <body>
+    <h1>Drawing to a design</h1>
+    <canvas id="asteroids" width="400" height="400"></canvas>
+    <script type="application/javascript">
+      var canvas = document.getElementById("asteroids");
+      var context = canvas.getContext("2d");
+
+      context.strokeStyle = "#00FF00";
+      context.fillStyle = "#009900";
+      draw_grid(context);
+      context.fillStyle = "#FFFF00";
+      context.strokeStyle = "#000000";
+      context.lineWidth = 2;
+      while(Math.random() < 0.99) {
+        draw_pacman(
+          context,
+          canvas.width * Math.random(),
+          canvas.height * Math.random(),
+          50 * Math.random(),
+          0.2 * Math.PI * Math.random()
+        );
+      }
+    </script>
+  </body>
+</html>

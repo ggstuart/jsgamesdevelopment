@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+  <head>
+    <title>This is an HTML canvas</title>
+    <style media="screen">
+      body {
+        text-align: center;
+        font-family: sans-serif;
+        margin: 0 2em;
+      }
+      canvas {
+        background-color: black;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>This is an HTML canvas</h1>
+    <canvas id="asteroids" width="400" height="400"></canvas>
+    <script type="application/javascript">
+      var canvas = document.getElementById("asteroids");
+      var context = canvas.getContext("2d");
+
+      context.centerText = function(text, y) {
+        var x = (this.canvas.width - this.measureText(text).width) / 2;
+        console.log(x);
+        this.fillText(text, x, y);
+        this.strokeText(text, x, y);
+      };
+
+      context.strokeStyle = '#DDDDDD';
+      context.fillStyle = '#555555';
+      context.lineWidth = 5;
+      context.rect(75, 50, 250, 300);
+      context.stroke();
+      context.fill();
+      context.font = "34px Arial";
+      context.strokeStyle = '#FF2222';
+      context.fillStyle = '#FFAAAA';
+      context.lineWidth = 0.75;
+      context.centerText("2D Drawing", 100);
+
+      context.font = "24px Arial";
+      context.centerText("its quite easy", 330);
+
+      context.strokeStyle = '#FFFFFF';
+      context.lineWidth = 2;
+      context.beginPath();
+      context.arc(200, 140, 20, 0, Math.PI * 2);
+      context.moveTo(200, 160);
+      context.lineTo(200, 220);
+      context.moveTo(180, 300);
+      context.lineTo(185, 260);
+      context.lineTo(200, 220);
+      context.lineTo(215, 260);
+      context.lineTo(220, 300);
+      context.moveTo(240, 130);
+      context.lineTo(225, 170);
+      context.lineTo(200, 170);
+      context.lineTo(175, 180);
+      context.lineTo(170, 220);
+      context.stroke();
+
+    </script>
+  </body>
+</html>

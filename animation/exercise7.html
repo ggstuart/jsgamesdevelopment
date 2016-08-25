@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Animating asteroids</title>
+    <link rel="stylesheet" href="styles.css" media="screen" title="no title" charset="utf-8">
+    <script type="text/javascript" src="drawing.js"></script>
+  </head>
+  <body>
+    <h1>Animating asteroids</h1>
+    <canvas id="asteroids" width="400" height="400"></canvas>
+    <script type="application/javascript">
+      'use strict';
+      var fps;
+      var canvas = document.getElementById("asteroids");
+      var context = canvas.getContext("2d");
+
+      var guide = false;
+      var asteroids = [
+        new Asteroid(50, 0.2, 24),
+        new Asteroid(50, 0.5, 24),
+        new Asteroid(50, 0.2, 5)
+      ];
+
+      function Asteroid(radius, noise, segments) {
+        this.x = canvas.width * Math.random();
+        this.y = canvas.height * Math.random();
+        this.angle = 0;
+        this.x_speed = canvas.width * (Math.random() - 0.5);
+        this.y_speed = canvas.height * (Math.random() - 0.5);
+        this.rotation_speed = 2 * Math.PI * (Math.random() - 0.5);
+        this.radius = radius;
+        this.noise = noise;
+        this.shape = [];
+        for(var i = 0; i < segments; i++) {
+          this.shape.push(2 * (Math.random() - 0.5));
+        }
+      }
+
+      Asteroid.prototype.update = function(elapsed) {
+        if(this.x - this.radius + elapsed * this.x_speed > canvas.width) {
+          this.x = -this.radius;
+        }
+        if(this.x + this.radius + elapsed * this.x_speed < 0) {
+          this.x = canvas.width + this.radius;
+        }
+        if(this.y - this.radius + elapsed * this.y_speed > canvas.height) {
+          this.y = -this.radius;
+        }
+        if(this.y + this.radius + elapsed * this.y_speed < 0) {
+          this.y = canvas.height + this.radius;
+        }
+        this.x += elapsed * this.x_speed;
+        this.y += elapsed * this.y_speed;
+        this.angle = (this.angle + this.rotation_speed * elapsed) % (2 * Math.PI);
+      }
+
+      Asteroid.prototype.draw = function(c, guide) {
+        c.save();
+        c.translate(this.x, this.y);
+        c.rotate(this.angle);
+        draw_asteroid(c, this.radius, this.shape, this.noise, guide);
+        c.restore();
+      }
+
+
+      function draw() {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.strokeStyle = "#00FF00";
+        context.fillStyle = "#00FF00";
+        draw_grid(context);
+        context.fillStyle = "#FFFFFF";
+        context.fillText(fps.toFixed(1) + " fps", canvas.width - 50, canvas.height - 10);// to keep track of performance
+        context.strokeStyle = "#FFFFFF";
+        context.fillStyle = "#000000";
+        context.lineWidth = 3;
+        asteroids.forEach(function(asteroid) {
+          asteroid.draw(context);
+        });
+      }
+
+      function update(elapsed) {
+        asteroids.forEach(function(asteroid) {
+          asteroid.update(elapsed);
+        });        
+      }
+
+      //our callback function to render the next frame
+      var previous; // remember the previous timestamp
+      function frame(timestamp) {
+        if (!previous) previous = timestamp;  // it runs once per frame
+        var elapsed = timestamp - previous;   // it calculates the elapsed time
+        update(elapsed/1000);                 // and passes it into the update() function
+        fps = 1000 / elapsed;                 // it calculates frames per second
+        draw();                               // it then calls the draw() function
+        previous = timestamp;                 // and remembers the time
+        window.requestAnimationFrame(frame);  // before asking the browser to call it again
+      }
+
+      window.requestAnimationFrame(frame); // this triggers the game loop to begin
+    </script>
+  </body>
+</html>

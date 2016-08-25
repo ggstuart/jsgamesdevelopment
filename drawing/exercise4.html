@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Drawing a spaceship</title>
+    <link rel="stylesheet" href="styles.css" media="screen" title="no title" charset="utf-8">
+    <script type="text/javascript" src="drawing.js"></script>
+  </head>
+  <body>
+    <h1>Drawing a spaceship</h1>
+    <canvas id="asteroids" width="400" height="400"></canvas>
+    <script type="application/javascript">
+      var canvas = document.getElementById("asteroids");
+      var context = canvas.getContext("2d");
+
+      context.strokeStyle = "#00FF00";
+      context.fillStyle = "#009900";
+      draw_grid(context);
+
+      context.strokeStyle = "#FFFFFF";
+      context.fillStyle = "#000000";
+      context.lineWidth = 2;
+
+      // context.translate(200, 200);
+      // draw_ship(context, 0.25 * Math.PI, 150, -Math.random(), Math.random() * Math.PI, true);
+
+      var x, y, angle = 0;
+      for(y = 20; y < canvas.height; y += 40) {
+        for(x = 20; x < canvas.width; x += 40) {
+          context.save();
+          context.translate(x, y);
+          context.rotate(angle);
+          draw_ship(context, 0.25 * Math.PI, 15, -Math.random(), 0.75 * Math.random() * Math.PI);
+          context.restore();
+          angle = (angle + 0.02 * Math.PI) % (2 * Math.PI);
+        }
+      }
+
+    </script>
+  </body>
+</html>
